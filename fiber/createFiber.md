@@ -1,19 +1,19 @@
-## Root와의 연결
+## Root와의 연결 및 초기화
 
 1.  진입점([index.js]())
     `ReactDOM.createRoot(document.getElementById('root')!).render(<App />);`
 
     `createRoot` 를 호출한다. 이는 react 프로젝트를 생성 및 초기화한다.
 
-2.  [ReactDOMRoot.js](https://github.com/facebook/react/blob/main/packages/react-dom/src/client/ReactDOMRoot.js)
+2.  인스턴스 생성([ReactDOMRoot.js](https://github.com/facebook/react/blob/main/packages/react-dom/src/client/ReactDOMRoot.js))
 
     `createRoot` 내부에서 `createContainer`를 사용해 `root`를 만들어 `new ReactDOMRoot(root)`를 반환한다. 이 `root`는 무엇일까?
 
-3.  [ReactFiberReconciler.js](https://github.com/facebook/react/blob/main/packages/react-reconciler/src/ReactFiberReconciler.js)
+3.  Dom과 Fiber의 연결점([ReactFiberReconciler.js](https://github.com/facebook/react/blob/main/packages/react-reconciler/src/ReactFiberReconciler.js))
 
     `createContainer`는 Renderer(DOM)와 Reconciler(Fiber)를 연결하는 추상화 계층으로, 내부에서 `createFiberRoot` 를 호출해 `root`를 만들어 반환한다. 이제 진짜 `root`를 찾으러 가보자.
 
-4.  [ReactFiberRoot.js](https://github.com/facebook/react/blob/main/packages/react-reconciler/src/ReactFiberRoot.js)
+4.  Fiber 생성 및 초기화([ReactFiberRoot.js](https://github.com/facebook/react/blob/main/packages/react-reconciler/src/ReactFiberRoot.js))
 
     `createFiberRoot` 내부에서 [FiberRootNode](https://github.com/facebook/react/blob/main/packages/react-reconciler/src/ReactFiberRoot.js#L50)의 `root`객체를 반환한다. 이 것이 react의 시작점에서 사용될 진짜 `root`이다.
 
