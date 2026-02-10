@@ -4,19 +4,19 @@
 
 **해당 과정은 앞서 호출한 workLoopConcurrent를 시작으로 FiberTree 전체를 beginWork 함수로 탐색하는 과정이다.**
 
-1. 반복되는 작업의 단위([beginWork]())
+1. 반복되는 작업의 단위([beginWork](https://github.com/facebook/react/blob/main/packages/react-reconciler/src/ReactFiberBeginWork.js#L4146))
 
    크게 2가지의 일을 처리한다.
 
-   1. props비교를 통한 레더 여부 판단.
+   1. props비교를 통한 렌더 여부 판단.
 
-      전역변수 `didReceiveUpdate`에 변경 여부를 저장하며, 변경이 없는 경우 diffing 없이 [bailoutOnAlreadyFinishedWork]() 함수 호출을 통해 자식 fiber를 반환하고 해당 `beginWork`를 종료한다.
+      전역변수 `didReceiveUpdate`에 변경 여부를 저장하며, 변경이 없는 경우 diffing 없이 [bailoutOnAlreadyFinishedWork](https://github.com/facebook/react/blob/main/packages/react-reconciler/src/ReactFiberBeginWork.js#L3761) 함수 호출을 통해 자식 fiber를 반환하고 해당 `beginWork`를 종료한다.
 
    2. 컴포넌트 타입별 비교 함수 호출
 
       변경이 있는 경우 해당 비교지점의 컴포넌트 타입에 따라 비교 함수를 호출한다. **결국 여기서 가장 중요한 effect가 표기된다고 보면 된다. 이 effect는 추후 실제 dom을 업데이트할지 판단하는 중요한 플래그가 된다.** _아래에서 계속_
 
-2. 비교 함수 호출([updateFunctionComponent]() _여기서는 함수형 컴포넌트 기준으로 설명한다._)
+2. 비교 함수 호출([updateFunctionComponent](https://github.com/facebook/react/blob/main/packages/react-reconciler/src/ReactFiberBeginWork.js#L1423) _여기서는 함수형 컴포넌트 기준으로 설명한다._)
 
    여기서는 크게 3가지의 일을 처리한다.
 
@@ -28,7 +28,7 @@
 
    2. diffing에 사용될 자식 reactElement 생성
 
-      [renderWithHooks]()를 통해 자식 reactElement를 생성한다.
+      [renderWithHooks](https://github.com/facebook/react/blob/main/packages/react-reconciler/src/ReactFiberBeginWork.js#L1505)를 통해 자식 reactElement를 생성한다.
 
       > _이 부분을 해석하는데 어려움을 겪었다. 이해한 바로는 아래 코드에서 `Component`인 `type`은 현재 컴포넌트가 반환하는 jsx를 해석한 객체이다. 따라서 자식 컴포넌트가 되는 것이다. 이를 통해 `renderWithHooks`는 자식 reactElement를 만들 수 있다._
 
@@ -52,9 +52,9 @@
 
    3. 자식에 대한 diffing 실행 및 **effect 표기**
 
-      [reconcileChildren]()를 통해 위에서 만들어진 reactElement와 지금 그려져있는 currentFiber를 비교하는 작업이며 **드디어 effect를 표기하는 구간이다!!!** 추가로 다음 beginWork에 사용될 wipFiber도 반환한다.
+      [reconcileChildren](https://github.com/facebook/react/blob/main/packages/react-reconciler/src/ReactFiberBeginWork.js#L1530)를 통해 위에서 만들어진 reactElement와 지금 그려져있는 currentFiber를 비교하는 작업이며 **드디어 effect를 표기하는 구간이다!!!** 추가로 다음 beginWork에 사용될 wipFiber도 반환한다.
 
-3. **diffing!!!**([reconcileChildren]())
+3. **diffing!!!**([reconcileChildren](https://github.com/facebook/react/blob/main/packages/react-reconciler/src/ReactFiberBeginWork.js#L1530))
 
    ```
    reconcileChildren(current, workInProgress, nextChildren, renderLanes);
@@ -62,7 +62,7 @@
 
    이와 같이 호출되며 내부적으로는 `reconcileChildren` > `reconcileChildFibers` > `reconcileChildFibersImpl`와 같은 흐름으로 동작한다.
 
-   `reconcileChildFibersImpl`에서는 newChild 즉 새로 그려질 자식의 타입에 따른 분기를 거친 후 적절한 함수를 호출해 **_업데이트된 child Fiber를 만들고_** **_effect를 표기한다_**.
+   `reconcileChildFibersImpl`에서는 newChild 즉 새로 그려질 자식의 타입에 따른 분기를 거친 후 적절한 함수를 호출해 **_child Fiber(wip.child)를 업데이트하고_** **_effect를 표기한다_**.
 
    > 💡 여기서 key/type의 매칭을 통해 동일한 fiber라면 `useFiber`를 사용해 기존것을 재사용한다(pendinProps, return, index, key 등은 당연히 업데이트).
    > 아니라면 `createFiberFromElement`를 사용해 새로 만듬!
