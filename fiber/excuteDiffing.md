@@ -43,7 +43,7 @@
       );
       ```
 
-      만약 `renderWithHooks`로 새로 그려질 자식 reactElement를 만드는 도중 그 자식 내부에서 업데이트가 일어난다면? 두가지 경우가 있을 것이다. _해당 과정은 `Component`의 내부에서 트리거될 것이다._
+      만약 `renderWithHooks`로 새로 그려질 자식 reactElement를 만드는 도중 그 자식 내부에서 업데이트가 일어난다면? 두가지 경우가 있을 것이다. _아래 과정은 `Component`의 내부에서 트리거 된다._
 
       1. (render phase update) setState등 렌더링중 일어나는 업데이트이다. `didScheduleRenderPhaseUpdateDuringThisPass`플래그가 켜지며 그또한 다 처리해서 완성한다. 이는 내부 renderWithHooksAgain를 통해 처리된다.
       2. (normal update) 이벤트나 타이머 등 렌더링외에 일어나는 업데이트이다. 이는 scheduleUpdateOnFiber로 따로 스케쥴되어 해당 과정이 다 끝나고 다른 work loop를 트리거하며 동작한다!
