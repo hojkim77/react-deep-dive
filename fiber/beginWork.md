@@ -72,3 +72,12 @@
    다음 beginWork는 이전 beginWork가 반환한 wip.child를 갖고 위 모든 동작을 다시 거치게 된다.
 
    > 💡 **이런 구조는 FiberTree가 LinkedList로 만들어졌기 때문!**
+
+## 비교 완료
+
+모든 child를 탐색하면 어떤 동작을 이어갈까? 바로 동작을 끝낼까? 아니다. completeWork가 시작된다. 다시 타고 올라가면서 sibling fiber가 있는지 본다. 있다면 그때는 다시 beginWork를 시작한다. 그렇게 그 sibling fiber도 child까지 탐색이 다 끝나면 여기서 또 completeWork가 시작된다.
+
+이렇듯 beginWork는 child를 탐색하러 쭉 내려가는 것, completeWork는 올라가며 flag와 lanes를 수집하는 동시에 sibling은 있는지 겻눈질까지 더해주는 것!
+wip가 null이 될때까지는 이 두가지가 performUnitOfWork를 통해 계속해서 번갈아가며 loop한다고 생각하면 된다!
+
+그렇다면 completeUnitOfWork와 CompeteWork는 뭘할까?
